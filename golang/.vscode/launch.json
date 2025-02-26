@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "backend-v1: run local",
+            "type": "go",
+            "request": "launch",
+            "program": "${workspaceFolder}/apps/backend-v1",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/../envs/local.env"
+        },
+        {
+            "name": "gen-type: run local",
+            "type": "go",
+            "request": "launch",
+            "program": "${workspaceFolder}/apps/gen-type",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/../envs/local.env"
+        }
+    ]
+}

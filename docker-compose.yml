@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    env_file:
+      - ./envs/local.env
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - internal
+    command: >
+      postgres -c max_connections=1000
+               -c shared_buffers=512MB
+               -c work_mem=16MB
+               -c effective_cache_size=1GB
+               -c maintenance_work_mem=256MB
+               -c idle_in_transaction_session_timeout=30000
+
+  backend:
+    build:
+      context: golang
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./envs/docker.env
+    volumes:
+      - ./envs:/envs
+    depends_on:
+      - postgres
+    command: bash -c "sleep 10 && ./main"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z -v postgres 5432"]
+      interval: 5s
+      retries: 5
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
