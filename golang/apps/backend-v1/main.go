@@ -85,10 +85,6 @@ func main() {
 	r.Post("/users/{id}/task/complete", middleware.WithRestApiSmartContext(sctx, func(sctx smart_context.ISmartContext, w http.ResponseWriter, r *http.Request) {})) // выполнение задания
 	r.Post("/users/{id}/referrer", middleware.WithRestApiSmartContext(sctx, func(sctx smart_context.ISmartContext, w http.ResponseWriter, r *http.Request) {}))      // ввод реферального кода (может быть id другого пользователя)
 
-	// r.Get("/api/info", middleware.WithRestApiSmartContext(sctx, handlers.InfoHandler))
-	// r.Post("/api/sendCoin", middleware.WithRestApiSmartContext(sctx, handlers.SendCoinHandler))
-	// r.Get("/api/buy/{item}", middleware.WithRestApiSmartContext(sctx, handlers.BuyItemHandler))
-
 	sctx.Info("Server listening on port " + BACKEND_PORT)
 	webServer := &http.Server{
 		Addr:         ":" + BACKEND_PORT,
