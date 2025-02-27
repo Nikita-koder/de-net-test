@@ -19,6 +19,11 @@ func GenerateUUID() *string {
 	return &uuid
 }
 
+func GetCurrentTime() *time.Time {
+	now := time.Now()
+	return &now
+}
+
 // Хеширование пароля
 func HashPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

@@ -1,2 +1,3 @@
 # envs/local.env
-.exe
+*.exe
+__debug_bin*

@@ -50,27 +50,38 @@ func GenerateToken(userID string) (string, error) {
 	return token.SignedString([]byte(jwtSecret))
 }
 func login(logger smart_context.ISmartContext, login string, password string) (resp string, status int) {
-	// Ищем пользователя
 	var user model.User
-	if err := logger.GetDB().First(&user, "username = ?", login).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// Создаём нового пользователя
-			hashedPassword, err := helpers.HashPassword(password)
-			if err != nil {
-				return `{"errors": "Ошибка хэширования пароля"}`, http.StatusInternalServerError
-			}
 
-			user = model.User{
-				ID:           helpers.GenerateUUID(),
-				Username:     login,
-				PasswordHash: hashedPassword,
+	err := logger.WithTransaction(func(tx *gorm.DB) error {
+		// Ищем пользователя
+		if err := tx.First(&user, "username = ?", login).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				// Создаём нового пользователя
+				hashedPassword, err := helpers.HashPassword(password)
+				if err != nil {
+					return err
+				}
+
+				user = model.User{
+					ID:           helpers.GenerateUUID(),
+					Username:     login,
+					PasswordHash: hashedPassword,
+				}
+				if err := tx.Create(&user).Error; err != nil {
+					return err
+				}
+			} else {
+				return err
 			}
-			if err := logger.GetDB().Create(&user).Error; err != nil {
-				return `{"errors": "Ошибка при создании пользователя"}`, http.StatusInternalServerError
-			}
-		} else {
-			return `{"errors": "Ошибка базы данных"}`, http.StatusInternalServerError
 		}
+		return nil
+	})
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return `{"errors": "Ошибка при создании пользователя"}`, http.StatusInternalServerError
+		}
+		return `{"errors": "Ошибка базы данных"}`, http.StatusInternalServerError
 	}
 
 	// Проверяем пароль
@@ -85,6 +96,7 @@ func login(logger smart_context.ISmartContext, login string, password string) (r
 	}
 	return token, http.StatusOK
 }
+
 func LoginHandler(sctx smart_context.ISmartContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var requestData struct {

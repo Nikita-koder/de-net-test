@@ -223,6 +223,19 @@ func (sc *SmartContext) GetDB() *gorm.DB {
 	tx = tx.Session(&gorm.Session{NewDB: true, PropagateUnscoped: true, Context: sc.GetContext()})
 	return tx
 }
+func (sc *SmartContext) WithTransaction(fn func(tx *gorm.DB) error) error {
+	tx := sc.GetDB().Begin() // Начинаем транзакцию
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	if err := fn(tx); err != nil {
+		tx.Rollback() // Откатываем транзакцию при ошибке
+		return err
+	}
+
+	return tx.Commit().Error // Фиксируем изменения
+}
 
 func getLogLevel() zapcore.Level {
 	logLevel := os.Getenv("LOG_LEVEL")

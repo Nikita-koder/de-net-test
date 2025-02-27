@@ -81,7 +81,7 @@ func main() {
 	// Роуты
 	r.Get("/users/{id}/status", middleware.WithRestApiSmartContext(sctx, user_handlers.UserStatusHandler)) // вся доступная информация о пользователе
 
-	r.Get("/users/leaderboard", middleware.WithRestApiSmartContext(sctx, func(sctx smart_context.ISmartContext, w http.ResponseWriter, r *http.Request) {}))         // топ пользователей с самым большим балансом
+	r.Get("/users/leaderboard", middleware.WithRestApiSmartContext(sctx, user_handlers.LeaderboardHandler))                                                          // топ пользователей с самым большим балансом
 	r.Post("/users/{id}/task/complete", middleware.WithRestApiSmartContext(sctx, func(sctx smart_context.ISmartContext, w http.ResponseWriter, r *http.Request) {})) // выполнение задания
 	r.Post("/users/{id}/referrer", middleware.WithRestApiSmartContext(sctx, func(sctx smart_context.ISmartContext, w http.ResponseWriter, r *http.Request) {}))      // ввод реферального кода (может быть id другого пользователя)
 

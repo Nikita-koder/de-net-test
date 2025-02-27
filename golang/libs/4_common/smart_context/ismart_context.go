@@ -37,6 +37,7 @@ type ISmartContext interface {
 
 	WithDB(db *gorm.DB) ISmartContext
 	GetDB() *gorm.DB
+	WithTransaction(fn func(tx *gorm.DB) error) error
 
 	// Метод для получения стандартного context.Context
 	WithContext(ctx context.Context) ISmartContext

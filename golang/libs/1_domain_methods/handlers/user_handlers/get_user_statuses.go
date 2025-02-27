@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"gorm.io/gorm"
 )
 
 type UserStatusResponse struct {
@@ -18,14 +19,23 @@ func UserStatusHandler(sctx smart_context.ISmartContext, w http.ResponseWriter, 
 
 	userID := chi.URLParam(r, "id")
 	var response UserStatusResponse
-	if err := sctx.GetDB().Select("users.id as user_id, username, balance").Joins("JOIN points ON points.user_id = users.id").Where("user_id = ?", userID).Scan(&response).Error; err != nil {
-		http.Error(w, "User not found", http.StatusNotFound)
+
+	err := sctx.WithTransaction(func(tx *gorm.DB) error {
+		return tx.Table("users").
+			Select("users.id as user_id, users.username, points.balance").
+			Joins("JOIN points ON points.user_id = users.id").
+			Where("users.id = ?", userID).
+			Find(&response).Error
+	})
+
+	if err != nil {
+		http.Error(w, `{"errors": "User not found"}`, http.StatusNotFound)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Ошибка кодирования JSON", http.StatusInternalServerError)
+		http.Error(w, `{"errors": "Ошибка кодирования JSON"}`, http.StatusInternalServerError)
 		return
 	}
 }
