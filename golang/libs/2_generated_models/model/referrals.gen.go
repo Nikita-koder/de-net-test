@@ -12,9 +12,9 @@ const TableNameReferral = "referrals"
 
 // Referral mapped from table <referrals>
 type Referral struct {
-	ID         *string    `gorm:"column:id;type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
-	ReferrerID string     `gorm:"column:referrer_id;type:uuid;not null" json:"referrer_id"`
-	ReferredID string     `gorm:"column:referred_id;type:uuid;not null" json:"referred_id"`
+	ID         string     `gorm:"column:id;type:text;primaryKey" json:"id"`
+	ReferrerID string     `gorm:"column:referrer_id;type:text;not null" json:"referrer_id"`
+	ReferredID string     `gorm:"column:referred_id;type:text;not null" json:"referred_id"`
 	CreatedAt  *time.Time `gorm:"column:created_at;type:timestamp without time zone;default:CURRENT_TIMESTAMP" json:"created_at"`
 }
 

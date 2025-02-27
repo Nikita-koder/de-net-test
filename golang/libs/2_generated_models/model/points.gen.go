@@ -12,7 +12,8 @@ const TableNamePoint = "points"
 
 // Point mapped from table <points>
 type Point struct {
-	UserID    string     `gorm:"column:user_id;type:uuid;primaryKey" json:"user_id"`
+	ID        string     `gorm:"column:id;type:text;primaryKey" json:"id"`
+	UserID    *string    `gorm:"column:user_id;type:text" json:"user_id"`
 	Balance   int32      `gorm:"column:balance;type:integer;not null" json:"balance"`
 	UpdatedAt *time.Time `gorm:"column:updated_at;type:timestamp without time zone;default:CURRENT_TIMESTAMP" json:"updated_at"`
 }

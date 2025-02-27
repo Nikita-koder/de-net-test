@@ -14,9 +14,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GenerateUUID() *string {
+func GenerateUUID() string {
 	uuid := uuid.NewString()
-	return &uuid
+	return uuid
 }
 
 func GetCurrentTime() *time.Time {

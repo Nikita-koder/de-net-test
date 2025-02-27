@@ -3,6 +3,19 @@ ENV_LOCAL=./envs/local.env
 include $(ENV_LOCAL)
 export $(shell sed 's/=.*//' $(ENV_LOCAL))
 
+# Переменные
+MIGRATE = migrate
+DB_URL = postgres://postgres:root@localhost:5432/postgres?sslmode=disable
+MIGRATIONS_DIR = ./migrations
+
+# Создание новой миграции
+create-migration:
+	@read -p "Введите название миграции: " name; \
+	$(MIGRATE) create -ext sql -dir $(MIGRATIONS_DIR) -seq $${name}
+
+# Применение миграций
+migrate-up:
+	$(MIGRATE) -path $(MIGRATIONS_DIR) -database $(DB_URL) up
 
 # Docker команды
 docker-up:
@@ -17,15 +30,3 @@ docker-logs:
 docker-restart:
 	docker-compose --file $(COMPOSE_FILE) down && docker-compose --file $(COMPOSE_FILE) up -d
 
-# Работа с БД и миграциями
-new-migration:
-	goose -dir db/migrations create $(name) sql
-
-migrate-up:
-	GOOSE_DRIVER=postgres GOOSE_DBSTRING="$(DATABASE_URL)" goose -dir db/migrations up
-
-migrate-down:
-	GOOSE_DRIVER=postgres GOOSE_DBSTRING="$(DATABASE_URL)" goose -dir db/migrations down
-
-migrate-status:
-	GOOSE_DRIVER=postgres GOOSE_DBSTRING="$(DATABASE_URL)" goose -dir db/migrations status

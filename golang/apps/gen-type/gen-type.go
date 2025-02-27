@@ -49,38 +49,3 @@ func main() {
 	g.Execute()
 
 }
-
-// Функция для объединения всех сгенерированных файлов в один
-func mergeGeneratedFiles(dir, outputFile string) {
-	files, err := os.ReadDir(dir)
-	if err != nil {
-		panic(err)
-	}
-
-	output, err := os.Create(outputFile)
-	if err != nil {
-		panic(err)
-	}
-	defer output.Close()
-
-	// Записываем заголовок пакета
-	output.WriteString("package model\n\n")
-
-	for _, file := range files {
-		if file.IsDir() || file.Name() == outputFile {
-			continue
-		}
-
-		content, err := os.ReadFile(dir + "/" + file.Name())
-		if err != nil {
-			panic(err)
-		}
-
-		// Записываем содержимое файла в выходной файл
-		output.Write(content)
-		output.WriteString("\n\n")
-
-		// Удаляем исходный файл
-		os.Remove(dir + "/" + file.Name())
-	}
-}

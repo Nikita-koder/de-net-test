@@ -12,9 +12,9 @@ const TableNameUserTask = "user_tasks"
 
 // UserTask mapped from table <user_tasks>
 type UserTask struct {
-	ID          *string    `gorm:"column:id;type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
-	UserID      string     `gorm:"column:user_id;type:uuid;not null" json:"user_id"`
-	TaskID      string     `gorm:"column:task_id;type:uuid;not null" json:"task_id"`
+	ID          string     `gorm:"column:id;type:text;primaryKey" json:"id"`
+	UserID      string     `gorm:"column:user_id;type:text;not null" json:"user_id"`
+	TaskID      string     `gorm:"column:task_id;type:text;not null" json:"task_id"`
 	CompletedAt *time.Time `gorm:"column:completed_at;type:timestamp without time zone;default:CURRENT_TIMESTAMP" json:"completed_at"`
 }
 

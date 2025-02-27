@@ -90,7 +90,7 @@ func login(logger smart_context.ISmartContext, login string, password string) (r
 	}
 
 	// Генерируем JWT
-	token, err := GenerateToken(*user.ID)
+	token, err := GenerateToken(user.ID)
 	if err != nil {
 		return `{"errors": "Ошибка генерации токена"}`, http.StatusInternalServerError
 	}

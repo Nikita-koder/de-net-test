@@ -12,7 +12,7 @@ const TableNameTask = "tasks"
 
 // Task mapped from table <tasks>
 type Task struct {
-	ID           *string    `gorm:"column:id;type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	ID           string     `gorm:"column:id;type:text;primaryKey" json:"id"`
 	Name         string     `gorm:"column:name;type:text;not null" json:"name"`
 	Description  *string    `gorm:"column:description;type:text" json:"description"`
 	PointsReward int32      `gorm:"column:points_reward;type:integer;not null" json:"points_reward"`
