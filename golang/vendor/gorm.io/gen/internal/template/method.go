@@ -271,7 +271,7 @@ func init() {
 	}
 }
 
-func Test_{{.QueryStructName}}Query(t *testing.T) {
+func TestUnit_{{.QueryStructName}}Query(t *testing.T) {
 	{{.QueryStructName}} := new{{.ModelStructName}}(_gen_test_db)
 	{{.QueryStructName}} = *{{.QueryStructName}}.As({{.QueryStructName}}.TableName())
 	_do := {{.QueryStructName}}.WithContext(context.Background()).Debug()
@@ -415,7 +415,7 @@ const DIYMethodTest = `
 
 var {{.OriginStruct.Type}}{{.MethodName}}TestCase = []TestCase{}
 
-func Test_{{.TargetStruct}}_{{.MethodName}}(t *testing.T) {
+func TestUnit_{{.TargetStruct}}_{{.MethodName}}(t *testing.T) {
 	{{.TargetStruct}} := new{{.OriginStruct.Type}}(_gen_test_db)
 	do := {{.TargetStruct}}.WithContext(context.Background()).Debug()
 
