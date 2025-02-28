@@ -16,7 +16,7 @@ type Task struct {
 	Name         string     `gorm:"column:name;type:text;not null" json:"name"`
 	Description  *string    `gorm:"column:description;type:text" json:"description"`
 	PointsReward int32      `gorm:"column:points_reward;type:integer;not null" json:"points_reward"`
-	CreatedAt    *time.Time `gorm:"column:created_at;type:timestamp without time zone;default:CURRENT_TIMESTAMP" json:"created_at"`
+	CreatedAt    *time.Time `gorm:"column:created_at;type:datetime;default:CURRENT_TIMESTAMP" json:"created_at"`
 }
 
 // TableName Task's table name

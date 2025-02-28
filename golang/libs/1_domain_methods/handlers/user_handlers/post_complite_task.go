@@ -22,21 +22,7 @@ func CompleteTaskHandler(sctx smart_context.ISmartContext, w http.ResponseWriter
 		return
 	}
 
-	err := sctx.WithTransaction(func(tx *gorm.DB) error {
-		// Проверяем, существует ли задание
-		var task model.Task
-		if err := tx.First(&task, "id = ?", requestData.TaskID).Error; err != nil {
-			return errors.New("task not found")
-		}
-
-		// Начисляем поинты пользователю
-		if err := tx.Exec("INSERT INTO points (user_id, balance) VALUES (?, ?) ON CONFLICT (user_id) DO UPDATE SET balance = points.balance + ?", userID, task.PointsReward, task.PointsReward).Error; err != nil {
-			return err
-		}
-
-		return nil
-	})
-
+	err := completeTask(sctx, userID, requestData.TaskID)
 	if err != nil {
 		http.Error(w, `{"errors": "`+err.Error()+`"}`, http.StatusInternalServerError)
 		return
@@ -44,4 +30,26 @@ func CompleteTaskHandler(sctx smart_context.ISmartContext, w http.ResponseWriter
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"success": true, "message": "Task completed"}`))
+}
+
+func completeTask(sctx smart_context.ISmartContext, userID, taskID string) (err error) {
+	err = sctx.WithTransaction(func(tx *gorm.DB) error {
+		// Проверяем, существует ли задание
+		var task model.Task
+		if err := tx.First(&task, "id = ?", taskID).Error; err != nil {
+			return errors.New("task not found")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	err = awardReferrerBonus(sctx, userID, 20)
+	if err != nil {
+		return err
+	}
+
+	return err
 }

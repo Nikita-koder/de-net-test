@@ -16,7 +16,7 @@ type User struct {
 	Username     string     `gorm:"column:username;type:text;not null" json:"username"`
 	Email        string     `gorm:"column:email;type:text;not null" json:"email"`
 	PasswordHash string     `gorm:"column:password_hash;type:text;not null" json:"password_hash"`
-	CreatedAt    *time.Time `gorm:"column:created_at;type:timestamp without time zone;default:CURRENT_TIMESTAMP" json:"created_at"`
+	CreatedAt    *time.Time `gorm:"column:created_at;type:datetime;default:CURRENT_TIMESTAMP" json:"created_at"`
 }
 
 // TableName User's table name

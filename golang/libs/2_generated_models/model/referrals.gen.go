@@ -15,7 +15,7 @@ type Referral struct {
 	ID         string     `gorm:"column:id;type:text;primaryKey" json:"id"`
 	ReferrerID string     `gorm:"column:referrer_id;type:text;not null" json:"referrer_id"`
 	ReferredID string     `gorm:"column:referred_id;type:text;not null" json:"referred_id"`
-	CreatedAt  *time.Time `gorm:"column:created_at;type:timestamp without time zone;default:CURRENT_TIMESTAMP" json:"created_at"`
+	CreatedAt  *time.Time `gorm:"column:created_at;type:datetime;default:CURRENT_TIMESTAMP" json:"created_at"`
 }
 
 // TableName Referral's table name

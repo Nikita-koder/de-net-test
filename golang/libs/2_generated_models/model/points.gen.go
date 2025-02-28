@@ -15,7 +15,7 @@ type Point struct {
 	ID        string     `gorm:"column:id;type:text;primaryKey" json:"id"`
 	UserID    *string    `gorm:"column:user_id;type:text" json:"user_id"`
 	Balance   int32      `gorm:"column:balance;type:integer;not null" json:"balance"`
-	UpdatedAt *time.Time `gorm:"column:updated_at;type:timestamp without time zone;default:CURRENT_TIMESTAMP" json:"updated_at"`
+	UpdatedAt *time.Time `gorm:"column:updated_at;type:datetime;default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
 // TableName Point's table name

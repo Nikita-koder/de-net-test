@@ -29,10 +29,21 @@ func SetReferrerHandler(sctx smart_context.ISmartContext, w http.ResponseWriter,
 		return
 	}
 
-	err := sctx.WithTransaction(func(tx *gorm.DB) error {
+	err := setReferrer(sctx, userID, requestData.ReferrerID)
+	if err != nil {
+		http.Error(w, `{"errors": "`+err.Error()+`"}`, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"success": true, "message": "Referral set successfully"}`))
+}
+
+func setReferrer(sctx smart_context.ISmartContext, userID, referrerID string) (err error) {
+	err = sctx.WithTransaction(func(tx *gorm.DB) error {
 		// Проверяем, существует ли реферер
 		var referrer model.User
-		if err := tx.First(&referrer, "id = ?", requestData.ReferrerID).Error; err != nil {
+		if err := tx.First(&referrer, "id = ?", referrerID).Error; err != nil {
 			return fmt.Errorf("referrer not found")
 		}
 
@@ -46,7 +57,7 @@ func SetReferrerHandler(sctx smart_context.ISmartContext, w http.ResponseWriter,
 		// Создаём запись о реферале
 		referral := model.Referral{
 			ID:         helpers.GenerateUUID(),
-			ReferrerID: requestData.ReferrerID,
+			ReferrerID: referrerID,
 			ReferredID: userID,
 			CreatedAt:  helpers.GetCurrentTime(),
 		}
@@ -54,20 +65,37 @@ func SetReferrerHandler(sctx smart_context.ISmartContext, w http.ResponseWriter,
 			return err
 		}
 
-		// Начисляем бонус рефереру (например, 50 поинтов)
-		referrerBonus := 50
-		if err := tx.Exec("INSERT INTO points (user_id, balance) VALUES (?, ?) ON CONFLICT (user_id) DO UPDATE SET balance = points.balance + ?", requestData.ReferrerID, referrerBonus, referrerBonus).Error; err != nil {
-			return err
-		}
-
 		return nil
 	})
-
 	if err != nil {
-		http.Error(w, `{"errors": "`+err.Error()+`"}`, http.StatusInternalServerError)
-		return
+		return err
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"success": true, "message": "Referral set successfully"}`))
+	err = awardReferrerBonus(sctx, referrerID, 10)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func awardReferrerBonus(sctx smart_context.ISmartContext, userID string, bonus int32) error {
+	return sctx.WithTransaction(func(tx *gorm.DB) error {
+		var existingPoints model.Point
+		if err := tx.First(&existingPoints, "user_id = ?", userID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				existingPoints = model.Point{UserID: &userID, Balance: bonus}
+				if err := tx.Create(&existingPoints).Error; err != nil {
+					return err
+				}
+			} else {
+				return err
+			}
+		} else {
+			if err := tx.Model(&existingPoints).Update("balance", gorm.Expr("balance + ?", bonus)).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
